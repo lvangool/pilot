@@ -28,7 +28,7 @@ var (
 	destIP   string
 )
 
-const VERSION = "0.2"
+const VERSION = "0.3"
 
 func main() {
 	flag.IntVar(&port, "port", 8050, "serve on port")
