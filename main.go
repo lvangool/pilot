@@ -15,11 +15,15 @@ type SysInfo struct {
 	IP       []string
 	CallerIP string
 	UpSince  time.Time
+	Version  string
 }
+
+const VERSION = "0.2"
 
 func main() {
 	sysInfo := &SysInfo{
 		UpSince: time.Now().UTC(),
+		Version: VERSION,
 	}
 	sysInfo.Hostname, _ = os.Hostname()
 	ifaces, _ := net.Interfaces()
@@ -41,5 +45,5 @@ func main() {
 		sysInfo.CallerIP = r.RemoteAddr
 		w.WriteJson(sysInfo)
 	}))
-	log.Fatal(http.ListenAndServe(":8080", api.MakeHandler()))
+	log.Fatal(http.ListenAndServe(":8050", api.MakeHandler()))
 }
