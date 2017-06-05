@@ -16,6 +16,7 @@ import (
 
 type SysInfo struct {
 	Hostname string
+	Node     string
 	IP       []string
 	CallerIP string
 	UpSince  time.Time
@@ -43,6 +44,7 @@ func main() {
 		Version: VERSION,
 	}
 	sysInfo.Hostname, _ = os.Hostname()
+	sysInfo.Node = os.Getenv("SERVER_NAME")
 	ifaces, _ := net.Interfaces()
 	// handle err
 	for _, i := range ifaces {
