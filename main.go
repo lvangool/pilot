@@ -85,6 +85,7 @@ func main() {
 					log.Println("200 OK")
 				}
 			case <-c:
+				log.Println("Received termination signal")
 				ticker.Stop()
 				os.Exit(1)
 				return
