@@ -21,6 +21,7 @@ type SysInfo struct {
 	CallerIP string
 	UpSince  time.Time
 	Version  string
+	Requests int
 }
 
 var (
@@ -29,7 +30,7 @@ var (
 	destIP   string
 )
 
-const VERSION = "0.3"
+const VERSION = "0.4"
 
 func main() {
 	flag.IntVar(&port, "port", 8050, "serve on port")
@@ -40,8 +41,9 @@ func main() {
 	log.Printf("Listening on %d\n", port)
 
 	sysInfo := &SysInfo{
-		UpSince: time.Now().UTC(),
-		Version: VERSION,
+		UpSince:  time.Now().UTC(),
+		Version:  VERSION,
+		Requests: 0,
 	}
 	sysInfo.Hostname, _ = os.Hostname()
 	sysInfo.Node = os.Getenv("SERVER_NAME")
@@ -62,6 +64,7 @@ func main() {
 	api.Use(rest.DefaultDevStack...)
 	api.SetApp(rest.AppSimple(func(w rest.ResponseWriter, r *rest.Request) {
 		sysInfo.CallerIP = r.RemoteAddr
+		sysInfo.Requests = sysInfo.Requests + 1
 		w.WriteJson(sysInfo)
 	}))
 
