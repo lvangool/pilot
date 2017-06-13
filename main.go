@@ -15,13 +15,14 @@ import (
 )
 
 type SysInfo struct {
-	Hostname string
-	Node     string
-	IP       []string
-	CallerIP string
-	UpSince  time.Time
-	Version  string
-	Requests int
+	Hostname  string
+	Node      string
+	IP        []string
+	CallerIP  string
+	UpSince   time.Time
+	Version   string
+	Requests  int
+	Namespace string
 }
 
 var (
@@ -30,7 +31,7 @@ var (
 	destIP   string
 )
 
-const VERSION = "0.4"
+const VERSION = "0.5"
 
 func main() {
 	flag.IntVar(&port, "port", 8050, "serve on port")
@@ -47,6 +48,8 @@ func main() {
 	}
 	sysInfo.Hostname, _ = os.Hostname()
 	sysInfo.Node = os.Getenv("SERVER_NAME")
+	sysInfo.Namespace = os.Getenv("NAMESPACE")
+
 	ifaces, _ := net.Interfaces()
 	// handle err
 	for _, i := range ifaces {
@@ -71,6 +74,11 @@ func main() {
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
+	timeout := time.Duration(1 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
 	// start the pinger
 	ticker := time.NewTicker(5 * time.Second)
 	go func() {
@@ -79,7 +87,7 @@ func main() {
 			case <-ticker.C:
 				// do stuff
 				log.Println("Checking siblings...")
-				response, err := http.Get(fmt.Sprintf("http://%s:%d/", destIP, destPort))
+				response, err := client.Get(fmt.Sprintf("http://%s:%d/", destIP, destPort))
 				if err != nil {
 					log.Printf("Error during HTTP Get Ping %s\n", err.Error())
 				} else if response.StatusCode != 200 {
