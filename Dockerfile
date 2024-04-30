@@ -5,5 +5,5 @@ COPY . $APP_HOME
 WORKDIR $APP_HOME
 
 RUN go get -d -v ./...
-RUN ls -lar
+RUN ls -lart
 RUN go build
